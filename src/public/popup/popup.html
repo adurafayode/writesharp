@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Rephraser</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+</head>
+<body>
+    <header>
+        <h1>Text Rephraser</h1>
+        <p>Improve clarity and professionalism</p>
+    </header>
+    <main>
+        <div id="original-text-container">
+            <label for="original-text">Original Text:</label>
+            <textarea id="original-text" readonly aria-label="Original text to be rephrased"></textarea>
+            <div class="char-count">0/500</div>
+        </div>
+        <div id="rephrased-text-container">
+            <label for="rephrased-text">Rephrased Text:</label>
+            <textarea id="rephrased-text" aria-label="Rephrased text, editable"></textarea>
+            <div class="char-count">0/500</div>
+        </div>
+        <div id="action-buttons">
+            <button id="apply-button" class="primary-button" aria-label="Apply rephrased text to original document">Apply</button>
+            <button id="edit-button" class="secondary-button" aria-label="Toggle editing of rephrased text">Edit</button>
+            <button id="rephrase-again-button" class="secondary-button" aria-label="Rephrase the text again">Rephrase Again</button>
+        </div>
+        <div id="loading-state" class="hidden">
+            <div class="spinner"></div>
+            <p>Rephrasing...</p>
+        </div>
+        <div id="error-state" class="hidden">
+            <div class="error-icon"></div>
+            <p id="error-message"></p>
+            <button id="try-again-button" class="secondary-button">Try Again</button>
+        </div>
+        <div id="settings-container" class="hidden">
+            <label for="api-key">API Key:</label>
+            <input type="password" id="api-key" aria-label="Enter your API key">
+            <button id="save-api-key" class="secondary-button">Save API Key</button>
+        </div>
+    </main>
+    <footer>
+        <p>Processed locally for privacy</p>
+        <a href="#" id="settings-link">Settings</a>
+    </footer>
+    <script src="popup.js"></script>
+</body>
+</html>
