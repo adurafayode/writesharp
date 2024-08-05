@@ -262,4 +262,5 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     console.log('All event listeners and functions set up');
+    
 });

@@ -29,18 +29,29 @@ function createRephraseButton() {
     button.textContent = 'Rephrase';
     button.id = 'rephrase-button';
     button.className = 'rephrase-button';
-    button.style.position = 'fixed';
+    button.style.position = 'absolute';
     button.style.zIndex = '9999999';
-    button.style.padding = '5px 10px';
+    button.style.padding = '8px 16px';
     button.style.backgroundColor = '#4285f4';
     button.style.color = 'white';
     button.style.border = 'none';
-    button.style.borderRadius = '3px';
+    button.style.borderRadius = '4px';
     button.style.cursor = 'pointer';
     button.style.fontSize = '14px';
-    button.style.fontFamily = 'Arial, sans-serif';
+    button.style.fontFamily = 'Roboto, Arial, sans-serif';
+    button.style.fontWeight = '500';
     button.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+    button.style.transition = 'background-color 0.3s ease';
     document.body.appendChild(button);
+    
+    // Add hover effect
+    button.addEventListener('mouseover', () => {
+        button.style.backgroundColor = '#3367d6';
+    });
+    button.addEventListener('mouseout', () => {
+        button.style.backgroundColor = '#4285f4';
+    });
+    
     return button;
 }
 
@@ -51,14 +62,29 @@ function showRephraseButton(selectedText) {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
 
-    button.style.top = `${rect.bottom + window.scrollY + 5}px`; // Added 5px offset
-    button.style.left = `${rect.left + window.scrollX}px`;
+    // Calculate position to avoid overlapping with text
+    const buttonWidth = 100; // Approximate width of the button
+    const buttonHeight = 36; // Approximate height of the button
+    let left = rect.left + window.scrollX;
+    let top = rect.bottom + window.scrollY + 5;
+
+    // Adjust position if it goes off-screen
+    if (left + buttonWidth > window.innerWidth) {
+        left = window.innerWidth - buttonWidth - 10;
+    }
+    if (top + buttonHeight > window.innerHeight) {
+        top = rect.top + window.scrollY - buttonHeight - 5;
+    }
+
+    button.style.left = `${left}px`;
+    button.style.top = `${top}px`;
     button.style.display = 'block';
 
     button.onclick = () => {
         console.log('[TextRephraser] Rephrase button clicked');
         copyToClipboard(selectedText);
         openPopup(selectedText);
+        hideRephraseButton(); // Hide button after clicking
     };
 }
 
