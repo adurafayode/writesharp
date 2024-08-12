@@ -44,7 +44,7 @@ Currently, WriteSharp supports manual installation only. Follow these steps to s
 1. **Clone the Repository**
 
 ```
-git clone https://github.com/yourusername/writesharp.git
+git clone https://github.com/adurafayode/writesharp.git
 cd writesharp
 ```
 
