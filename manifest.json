@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "WriteSharp",
     "version": "1.0",
-    "description": "A plugin to rephrase selected text across different editors.",
+    "description": "Chrome extension for AI-assisted writing improvement",
     "permissions": [
       "activeTab",
       "storage",
