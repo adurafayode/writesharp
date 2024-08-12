@@ -10,6 +10,25 @@ WriteSharp is your AI-powered intelligent writing companion, available as a Chro
 * Optionally revise or edit the refined text.
 * Click `Insert` to replace the original text.
 
+### WriteSharp in Action (Screenshot)
+
+![WriteSharp improving text clarity](./src/public/images/writesharp-demo.png)
+
+WriteSharp seamlessly integrates with your browser, allowing you to improve your writing with just a few clicks. As shown above, it transforms complex, wordy text into clear, concise language - perfect for emails, reports, or any written communication. By clicking `Insert`, the original text would be replaced with the improved version."
+
+**Original Text**
+
+```
+The implementation of the aforementioned protocol necessitates a comprehensive understanding of the underlying mechanisms. It is imperative that all stakeholders involved in the process maintain a high level of cognizance regarding the potential ramifications of their actions. The successful execution of this initiative is contingent upon the synergistic collaboration of multiple departments within the organizational structure.
+```
+
+**Refined Text by GPT-4o**
+
+```
+Implementing this protocol requires a thorough understanding of its mechanisms. All stakeholders must be aware of the potential consequences of their actions. Successful execution depends on the collaborative efforts of various departments within the organization.
+```
+
+
 ## Features and Benefits
 
 * **Instant Text Enhancement**: Automatically improves selected text when the popup is launched, focusing on clarity and professionalism.
