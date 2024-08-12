@@ -1,10 +1,19 @@
-// src/popup.js
+// WriteSharp Popup Script
 
-console.log('popup.js loaded');
+const DEBUG = false;  // Set to true to enable debug logging
+
+function log(message, ...args) {
+    if (DEBUG) {
+        console.log(`[WriteSharp] ${message}`, ...args);
+    }
+}
+
+log('Popup script loaded');
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded event fired');
+    log('DOMContentLoaded event fired');
 
+    // DOM element references
     const originalTextArea = document.getElementById('original-text');
     const rephrasedTextArea = document.getElementById('rephrased-text');
     const applyButton = document.getElementById('apply-button');
@@ -18,28 +27,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsContainer = document.getElementById('settings-container');
     const apiKeyInput = document.getElementById('api-key');
     const saveApiKeyButton = document.getElementById('save-api-key');
+    const customPromptTextarea = document.getElementById('custom-prompt');
+    const saveCustomPromptButton = document.getElementById('save-custom-prompt');
+    const useCustomPromptToggle = document.getElementById('use-custom-prompt');
 
-    const MAX_CHARS = 500;
+    const MAX_CHARS = 750;
 
     // Ensure settings container starts hidden
     settingsContainer.classList.add('hidden');
     settingsContainer.style.display = 'none';
-
-    console.log('Initial DOM state:');
-    console.log('Settings link:', settingsLink);
-    console.log('Settings container:', settingsContainer);
-    console.log('Settings container display:', settingsContainer.style.display);
-    console.log('Settings container classList:', settingsContainer.classList);
+    
+    log('Initial DOM state:', {
+        settingsLink,
+        settingsContainer,
+        settingsContainerDisplay: settingsContainer.style.display,
+        settingsContainerClassList: settingsContainer.classList
+    });
 
     if (!settingsLink) {
-        console.error('Settings link not found in the DOM');
+        console.warn('[WriteSharp] Settings link not found in the DOM');
     }
 
     if (!settingsContainer) {
-        console.error('Settings container not found in the DOM');
+        console.warn('[WriteSharp] Settings container not found in the DOM');
     }
 
-    // Load selected text and API key
+    /**
+     * Loads the selected text from storage and initializes the rephrasing process
+     */
     function loadSelectedText() {
         chrome.storage.local.get(['selectedText'], (result) => {
             if (result.selectedText) {
@@ -52,56 +67,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadSelectedText();
 
+    // Load API key from storage
     chrome.storage.sync.get(['apiKey'], (result) => {
         if (result.apiKey) {
             apiKeyInput.value = result.apiKey;
         }
     });
 
-    // Add listener for updateSelectedText message
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        console.log('Message received in popup:', request);
-        if (request.action === 'updateSelectedText') {
-            console.log('Updating selected text in popup:', request.text);
-            originalTextArea.value = request.text;
-            updateCharCount(originalTextArea);
-            sendResponse({status: 'Text updated in popup'});
+    // Load custom prompt and toggle state
+    chrome.storage.sync.get(['customPrompt', 'useCustomPrompt'], (result) => {
+        if (result.customPrompt) {
+            customPromptTextarea.value = result.customPrompt;
+            updateCharCount(customPromptTextarea);
         }
-        return true; // Keeps the message channel open for asynchronous responses
+        if (result.useCustomPrompt !== undefined) {
+            useCustomPromptToggle.checked = result.useCustomPrompt;
+        }
     });
 
+    // Event listeners for settings
+    saveCustomPromptButton.addEventListener('click', () => {
+        const customPrompt = customPromptTextarea.value.trim();
+        chrome.storage.sync.set({customPrompt}, () => {
+            if (chrome.runtime.lastError) {
+                console.warn('[WriteSharp] Error saving custom prompt:', chrome.runtime.lastError);
+                showMessage('Error saving custom prompt. Please try again.', 'error');
+            } else {
+                showMessage('Custom prompt saved successfully!', 'success');
+            }
+        });
+    });
+
+    useCustomPromptToggle.addEventListener('change', () => {
+        const useCustomPrompt = useCustomPromptToggle.checked;
+        chrome.storage.sync.set({useCustomPrompt}, () => {
+            if (chrome.runtime.lastError) {
+                console.warn('[WriteSharp] Error saving custom prompt toggle state:', chrome.runtime.lastError);
+                showMessage('Error saving settings. Please try again.', 'error');
+            } else {
+                showMessage(useCustomPrompt ? 'Using custom prompt' : 'Using default prompt', 'success');
+            }
+        });
+    });
+    
+    customPromptTextarea.addEventListener('input', () => updateCharCount(customPromptTextarea));
+
+    /**
+     * Shows the loading state and hides the error state
+     */
     function showLoading() {
-        console.log('Showing loading state');
+        log('Showing loading state');
         if (loadingState) {
             loadingState.classList.remove('hidden');
         } else {
-            console.error('Loading state element not found');
+            console.warn('[WriteSharp] Loading state element not found');
         }
         if (errorState) {
             errorState.classList.add('hidden');
         }
     }
 
+    /**
+     * Hides the loading state
+     */
     function hideLoading() {
-        console.log('Hiding loading state');
+        log('Hiding loading state');
         if (loadingState) {
             loadingState.classList.add('hidden');
         } else {
-            console.error('Loading state element not found');
+            console.warn('[WriteSharp] Loading state element not found');
         }
     }
 
+    /**
+     * Sends a request to rephrase the given text
+     * @param {string} text - The text to rephrase
+     */
     async function rephrase(text) {
         showLoading();
         let retries = 3;
         while (retries > 0) {
             try {
-                console.log('Sending rephrase request for text:', text);
+                log('Sending rephrase request for text:', text);
+                const [customPrompt, useCustomPrompt] = await Promise.all([
+                    new Promise(resolve => chrome.storage.sync.get(['customPrompt'], result => resolve(result.customPrompt))),
+                    new Promise(resolve => chrome.storage.sync.get(['useCustomPrompt'], result => resolve(result.useCustomPrompt)))
+                ]);
                 const response = await chrome.runtime.sendMessage({
                     action: 'rephrase',
-                    text: text
+                    text: text,
+                    customPrompt: useCustomPrompt ? customPrompt : null
                 });
-                console.log('Received response:', response);
+                log('Received response:', response);
                 if (response.error) {
                     throw new Error(response.error);
                 }
@@ -110,25 +167,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 hideLoading();
                 return;
             } catch (error) {
-                console.error('Error during rephrasing:', error);
+                console.warn('[WriteSharp] Error during rephrasing:', error);
                 retries--;
                 if (retries === 0) {
                     showError(error.message);
                     hideLoading();
                 } else {
-                    console.log(`Retrying... ${retries} attempts left`);
+                    log(`Retrying... ${retries} attempts left`);
                     await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
                 }
             }
         }
     }
 
+    /**
+     * Shows an error message
+     * @param {string} message - The error message to display
+     */
     function showError(message) {
         errorState.classList.remove('hidden');
         errorMessage.textContent = message;
-        console.error('Showing error:', message);
+        console.warn('[WriteSharp] Error:', message);
     }
 
+    /**
+     * Updates the character count for a textarea
+     * @param {HTMLTextAreaElement} textarea - The textarea to update the character count for
+     */
     function updateCharCount(textarea) {
         const charCount = textarea.value.length;
         const charCountEl = textarea.nextElementSibling;
@@ -142,21 +207,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Sends a message to the content script to apply the rephrased text
+     * @param {number} tabId - The ID of the tab to send the message to
+     * @param {string} text - The rephrased text to apply
+     */
+    function sendMessageToContentScript(tabId, text) {
+        chrome.tabs.sendMessage(tabId, {
+            action: 'applyRephrasedText',
+            text: text
+        }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.warn('[WriteSharp] Error sending message:', chrome.runtime.lastError);
+                showError('Failed to apply text. Please refresh the page and try again.');
+            } else if (response && response.error) {
+                console.warn('[WriteSharp] Error from content script:', response.error);
+                showError(response.error);
+            } else {
+                log('Message sent successfully, response:', response);
+                window.close(); 
+            }
+        });
+    }
+
+    // Event listeners for buttons
     applyButton.addEventListener('click', () => {
-        console.log('Apply button clicked');
+        log('Apply button clicked');
         if (rephrasedTextArea.value.trim() === '') {
             showError('Cannot apply empty text. Please rephrase first.');
             return;
         }
+        
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, {
-                action: 'applyRephrasedText',
-                text: rephrasedTextArea.value
-            });
+            if (chrome.runtime.lastError) {
+                console.warn('[WriteSharp] Error querying tabs:', chrome.runtime.lastError);
+                showError('An error occurred. Please try again.');
+                return;
+            }
+            if (tabs.length === 0) {
+                console.warn('[WriteSharp] No active tab found');
+                showError('No active tab found. Please try again.');
+                return;
+            }
+            const tabId = tabs[0].id;
+            sendMessageToContentScript(tabId, rephrasedTextArea.value);
         });
-        window.close();
     });
-
+    
     editButton.addEventListener('click', () => {
         const isEditing = rephrasedTextArea.readOnly;
         rephrasedTextArea.readOnly = !isEditing;
@@ -165,11 +262,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isEditing) {
             rephrasedTextArea.focus();
         }
-        console.log('Edit button clicked, isEditing:', !isEditing);
+        log('Edit button clicked, isEditing:', !isEditing);
     });
 
     rephraseAgainButton.addEventListener('click', () => {
-        console.log('Rephrase Again button clicked');
+        log('Rephrase Again button clicked');
         rephrase(originalTextArea.value);
     });
 
@@ -181,9 +278,9 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsLink.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Settings link clicked');
-        console.log('Settings container display before:', settingsContainer.style.display);
-        console.log('Settings container classList before:', settingsContainer.classList);
+        log('Settings link clicked');
+        log('Settings container display before:', settingsContainer.style.display);
+        log('Settings container classList before:', settingsContainer.classList);
 
         if (settingsContainer.classList.contains('hidden')) {
             settingsContainer.classList.remove('hidden');
@@ -193,8 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
             settingsContainer.style.display = 'none';
         }
 
-        console.log('Settings container display after:', settingsContainer.style.display);
-        console.log('Settings container classList after:', settingsContainer.classList);
+        log('Settings container display after:', settingsContainer.style.display);
+        log('Settings container classList after:', settingsContainer.classList);
     });
 
     saveApiKeyButton.addEventListener('click', () => {
@@ -203,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveApiKeyButton.disabled = true;
             chrome.storage.sync.set({apiKey}, () => {
                 if (chrome.runtime.lastError) {
-                    console.error('Error saving API key:', chrome.runtime.lastError);
+                    console.warn('[WriteSharp] Error saving API key:', chrome.runtime.lastError);
                     showMessage('Error saving API key. Please try again.', 'error');
                 } else {
                     showMessage('API key saved successfully!', 'success');
@@ -219,10 +316,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    /**
+     * Validates the format of the API key
+     * @param {string} apiKey - The API key to validate
+     * @returns {boolean} True if the API key is valid, false otherwise
+     */
     function validateApiKey(apiKey) {
         return /^sk-[A-Za-z0-9_-]{48,98}$/.test(apiKey);
     }
 
+    /**
+     * Shows a message in the settings container
+     * @param {string} message - The message to display
+     * @param {string} type - The type of message ('error' or 'success')
+     */
     function showMessage(message, type) {
         const messageElement = document.createElement('div');
         messageElement.textContent = message;
@@ -233,9 +340,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    // Event listeners for character count updates
     originalTextArea.addEventListener('input', () => updateCharCount(originalTextArea));
     rephrasedTextArea.addEventListener('input', () => updateCharCount(rephrasedTextArea));
 
+    // Event listeners for closing the popup
     document.addEventListener('click', (e) => {
         if (e.target.closest('body') === null) {
             window.close();
@@ -248,19 +357,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.toggleSettings = () => {
-        console.log('Manual toggle triggered');
-        if (settingsContainer.classList.contains('hidden')) {
-            settingsContainer.classList.remove('hidden');
-            settingsContainer.style.display = 'block';
-        } else {
-            settingsContainer.classList.add('hidden');
-            settingsContainer.style.display = 'none';
-        }
-        console.log('Settings container display after manual toggle:', settingsContainer.style.display);
-        console.log('Settings container classList after manual toggle:', settingsContainer.classList);
-    };
-
-    console.log('All event listeners and functions set up');
-    
+    log('All event listeners and functions set up');
 });

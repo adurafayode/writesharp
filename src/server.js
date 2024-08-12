@@ -1,3 +1,5 @@
+// WriteSharp Server
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -6,6 +8,14 @@ const { Configuration, OpenAIApi } = require("openai");
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+
+const DEBUG = process.env.NODE_ENV === 'development';
+
+function log(message, ...args) {
+    if (DEBUG) {
+        console.log(`[WriteSharp] ${message}`, ...args);
+    }
+}
 
 // Middleware
 app.use(express.json());
@@ -33,12 +43,14 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Ensure MAX_TEXT_LENGTH is set
-const MAX_TEXT_LENGTH = parseInt(process.env.MAX_TEXT_LENGTH) || 500;
-console.log(`MAX_TEXT_LENGTH set to: ${MAX_TEXT_LENGTH}`);
+const MAX_TEXT_LENGTH = parseInt(process.env.MAX_TEXT_LENGTH) || 750;
+log(`MAX_TEXT_LENGTH set to: ${MAX_TEXT_LENGTH}`);
 
-// API endpoint
+/**
+ * API endpoint for rephrasing text
+ */
 app.post('/api/rephrase', async (req, res) => {
-  const { text } = req.body;
+  const { text, customPrompt } = req.body;
   const apiKey = req.headers['x-api-key'];
 
   if (!text) {
@@ -57,33 +69,59 @@ app.post('/api/rephrase', async (req, res) => {
     const configuration = new Configuration({ apiKey });
     const openai = new OpenAIApi(configuration);
 
+    const systemPrompt = `You are WriteSharp, an AI that enhances text clarity and professionalism. 
+    Rephrase input text, maintaining original intent. Provide only the enhanced version.`;
+
+    const defaultUserPrompt = `Improve the following text with these guidelines: 
+
+    - Simplify complex sentences 
+    - Use precise, professional language 
+    - Ensure consistent tone and improved flow 
+    - Correct grammar and punctuation 
+    - Adapt to professional contexts 
+    
+    Input text:`;
+
+    const userMessage = customPrompt
+      ? `${customPrompt}\n\nInput text:\n\n${text}`
+      : `${defaultUserPrompt}\n\n${text}`;
+
     const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o",
       messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: `Rephrase the following text to improve clarity and professionalism:\n\n${text}` }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage }
       ],
-      max_tokens: 300,
+      max_tokens: 450,
       temperature: 0.7,
     });
+
+    if (DEBUG) {
+      log('OpenAI API request:', {
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage }
+        ]
+      });
+    }
 
     const rephrasedText = response.data.choices[0].message.content.trim();
     res.json({ rephrasedText });
   } catch (error) {
-    console.error('Error in /api/rephrase:', error);
+    console.error('[WriteSharp] Error in /api/rephrase:', error);
     if (error.response) {
-      console.error('OpenAI API responded with:', error.response.status, error.response.data);
+      console.error('[WriteSharp] OpenAI API responded with:', error.response.status, error.response.data);
     }
     res.status(500).json({ 
       error: 'Failed to rephrase text. Please try again.',
       details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      stack: DEBUG ? error.stack : undefined
     });
   }
 });
 
 // Use environment variable for port
 const PORT = parseInt(process.env.PORT) || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => log(`Server running on port ${PORT}`));
 
 module.exports = app; // For testing purposes

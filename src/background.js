@@ -1,25 +1,41 @@
-console.log('[TextRephraser] Background script loaded');
+// WriteSharp Background Script
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('[TextRephraser] Text Rephraser extension installed');
-});
-
+const DEBUG = false;  // Set to true to enable debug logging
 const BACKEND_URL = 'http://localhost:4000/api/rephrase';
 
+function log(message, ...args) {
+    if (DEBUG) {
+        console.log(`[WriteSharp] ${message}`, ...args);
+    }
+}
+
+log('Background script loaded');
+
+/**
+ * Listener for extension installation
+ */
+chrome.runtime.onInstalled.addListener(() => {
+  log('WriteSharp extension installed');
+});
+
+/**
+ * Handles messages from content script and popup
+ * Implements the 'rephrase' action for selected texts
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('[TextRephraser] Message received in background:', request);
+  log('Message received in background:', request);
 
   if (request.action === 'rephrase') {
-    console.log('[TextRephraser] Rephrasing text:', request.text);
-    chrome.storage.sync.get(['apiKey'], async (result) => {
+    log('Rephrasing text:', request.text);
+    chrome.storage.sync.get(['apiKey', 'customPrompt', 'useCustomPrompt'], async (result) => {
       if (!result.apiKey) {
-        console.error('[TextRephraser] API key not set');
+        console.warn('[WriteSharp] API key not set');
         sendResponse({ error: 'API key not set. Please set your OpenAI API key in the extension settings.' });
         return;
       }
 
       try {
-        console.log('[TextRephraser] Sending request to:', BACKEND_URL);
+        log('Sending request to:', BACKEND_URL);
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
           mode: 'cors',
@@ -29,36 +45,58 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             'X-API-Key': result.apiKey,
             'Origin': chrome.runtime.getURL(''),
           },
-          body: JSON.stringify({ text: request.text }),
+          body: JSON.stringify({ 
+            text: request.text,
+            customPrompt: result.useCustomPrompt ? result.customPrompt : null
+          }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          console.error('[TextRephraser] Error response:', data);
+          console.warn('[WriteSharp] Error response:', data);
           sendResponse({ error: data.error || 'An unknown error occurred' });
           return;
         }
 
-        console.log('[TextRephraser] Rephrased text:', data.rephrasedText);
+        log('Rephrased text:', data.rephrasedText);
         sendResponse({ rephrasedText: data.rephrasedText, status: 'Text rephrased' });
       } catch (error) {
-        console.error('[TextRephraser] Error:', error);
+        console.error('[WriteSharp] Error:', error);
         sendResponse({ error: error.message || 'An unknown error occurred' });
       }
     });
 
     return true; // Indicates that the response is sent asynchronously
-  }
-  // ... (rest of the listener code)
+  } 
 });
 
-// Test server connection
-fetch('http://localhost:4000/api/rephrase', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ text: 'Test' }),
-})
-  .then(response => response.json())
-  .then(data => console.log('[TextRephraser] Server test:', data))
-  .catch(error => console.error('[TextRephraser] Server test failed:', error));
+/**
+ * Tests the connection to the backend server
+ * @returns {Promise<boolean>} True if the connection is successful, false otherwise
+ */
+async function testServerConnection() {
+  try {
+      const response = await fetch(`${BACKEND_URL}/health`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+      });
+      
+      if (response.ok) {
+          log('Server connection test successful');
+          return true;
+      } else {
+          console.warn('[WriteSharp] Server connection test failed:', response.statusText);
+          return false;
+      }
+  } catch (error) {
+      console.warn('[WriteSharp] Server connection test failed:', error);
+      return false;
+  }
+}
+
+// We can call this function when needed, for example:
+// chrome.runtime.onInstalled.addListener(async () => {
+//     log('WriteSharp extension installed');
+//     await testServerConnection();
+// });

@@ -1,53 +1,67 @@
-console.log('[TextRephraser] Content script loaded');
+// WriteSharp Content Script
 
+const DEBUG = false;  // Set to true to enable debug logging
+
+function log(message, ...args) {
+    if (DEBUG) {
+        console.log(`[WriteSharp] ${message}`, ...args);
+    }
+}
+
+log('Content script loaded');
+
+/**
+ * Handles text selection events on the page.
+ * When text is selected, it stores the selection locally.
+ */
 function handleTextSelection() {
-    console.log('[TextRephraser] Text selection event triggered in content.js');
     const selectedText = window.getSelection().toString().trim();
-    console.log('[TextRephraser] Selected text:', selectedText);
+    
     if (selectedText) {
         chrome.storage.local.set({selectedText: selectedText}, function() {
-            console.log('Selected text stored locally.');
-            chrome.runtime.sendMessage({action: 'showRephraseButton', text: selectedText}, response => {
-                console.log('[TextRephraser] Response from background:', response);
-            });
+            log('Selected text stored locally');
         });
     }
 }
 
+/**
+ * Initializes the content script by adding event listeners.
+ */
 function initializeContentScript() {
-    console.log('[TextRephraser] Initializing content script');
-    if (window.location.hostname.includes('mail.google.com')) {
-        console.log('[TextRephraser] Gmail detected');
-        // Add any additional Gmail-specific logic here
-    } else if (window.location.hostname.includes('zendesk.com')) {
-        console.log('[TextRephraser] Zendesk detected');
-        // Add any additional Zendesk-specific logic here
-    }
-
+    log('Initializing content script');
     document.addEventListener('mouseup', handleTextSelection);
 }
 
+// Check if the DOM is already loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeContentScript);
 } else {
     initializeContentScript();
 }
 
+/**
+ * Listens for messages from the background script.
+ * Handles the 'applyRephrasedText' action to replace selected text with rephrased text.
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('[TextRephraser] Message received in content script:', request);
+    log('Message received in content script:', request);
+    
     if (request.action === 'applyRephrasedText') {
-        console.log('[TextRephraser] Applying rephrased text:', request.text);
         const selection = window.getSelection();
+        
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
             range.deleteContents();
             range.insertNode(document.createTextNode(request.text));
-            console.log('[TextRephraser] Rephrased text applied');
+            log('Rephrased text applied');
             sendResponse({ status: 'Rephrased text applied' });
         } else {
-            console.log('[TextRephraser] No selection range found');
+            console.warn('[WriteSharp] No selection range found');
             sendResponse({ error: 'No selection range found' });
         }
+    } else {
+        console.warn('[WriteSharp] Unrecognized action:', request.action);
     }
-    return true; // Keeps the message channel open for asynchronous responses
+    
+    return true;
 });

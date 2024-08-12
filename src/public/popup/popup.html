@@ -3,50 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Rephraser</title>
+    <title>WriteSharp</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="popup.css">
 </head>
 <body>
+    <!-- Header -->
     <header>
-        <h1>Text Rephraser</h1>
+        <h1>WriteSharp</h1>
         <p>Improve clarity and professionalism</p>
     </header>
+
     <main>
+        <!-- Original text input -->
         <div id="original-text-container">
             <label for="original-text">Original Text:</label>
             <textarea id="original-text" readonly aria-label="Original text to be rephrased"></textarea>
-            <div class="char-count">0/500</div>
+            <div class="char-count">0/750</div>
         </div>
+
+        <!-- Rephrased text output -->
         <div id="rephrased-text-container">
-            <label for="rephrased-text">Rephrased Text:</label>
+            <label for="rephrased-text">Refined Text:</label>
             <textarea id="rephrased-text" aria-label="Rephrased text, editable"></textarea>
-            <div class="char-count">0/500</div>
+            <div class="char-count">0/750</div>
         </div>
+
+        <!-- Action buttons -->
         <div id="action-buttons">
-            <button id="apply-button" class="primary-button" aria-label="Apply rephrased text to original document">Apply</button>
+            <button id="apply-button" class="primary-button" aria-label="Apply rephrased text to original document">Insert</button>
             <button id="edit-button" class="secondary-button" aria-label="Toggle editing of rephrased text">Edit</button>
-            <button id="rephrase-again-button" class="secondary-button" aria-label="Rephrase the text again">Rephrase Again</button>
+            <button id="rephrase-again-button" class="secondary-button" aria-label="Rephrase the text again">Revise</button>
         </div>
+
+        <!-- Loading state -->
         <div id="loading-state" class="hidden">
             <div class="spinner"></div>
-            <p>Rephrasing...</p>
+            <p>Rewriting...</p>
         </div>
+
+        <!-- Error state -->
         <div id="error-state" class="hidden">
             <div class="error-icon"></div>
             <p id="error-message"></p>
             <button id="try-again-button" class="secondary-button">Try Again</button>
         </div>
+
+        <!-- Settings container -->
         <div id="settings-container" class="hidden" style="display: none;">
-            <label for="api-key">API Key:</label>
-            <input type="password" id="api-key" aria-label="Enter your API key">
-            <button id="save-api-key" class="secondary-button">Save API Key</button>
+            <div class="settings-section">
+                <label for="api-key">API Key:</label>
+                <input type="password" id="api-key" aria-label="Enter your API key">
+                <button id="save-api-key" class="secondary-button">Save API Key</button>
+            </div>
+            <div class="settings-section">
+                <label for="custom-prompt">Custom Prompt:</label>
+                <textarea id="custom-prompt" aria-label="Enter your custom rephrasing prompt"></textarea>
+                <div class="char-count">0/750</div>
+                <button id="save-custom-prompt" class="secondary-button">Save Custom Prompt</button>
+            </div>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="use-custom-prompt">
+                    <span class="slider round"></span>
+                </label>
+                <span>Use Custom Prompt</span>
+            </div>
         </div>
     </main>
+
+    <!-- Footer -->
     <footer>
         <p>Processed locally for privacy</p>
         <a href="#" id="settings-link">Settings</a>
     </footer>
+
     <script src="popup.js"></script>
 </body>
 </html>
