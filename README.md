@@ -75,6 +75,16 @@ node server.js
 
 6. **Verify Installation**
 
+* You should now see the WriteSharp icon in your Chrome extensions toolbar.
+* Click on the icon to open the popup and start using WriteSharp!
+
+> Note: Make sure to keep the server running while using the extension. If you close the terminal or shut down your computer, you'll need to start the server again (step 4) to use WriteSharp.
+
+### Troubleshooting
+
+* If you encounter any issues with the extension not loading, try refreshing the `chrome://extensions/` page and reloading the unpacked extension.
+* Ensure that your Node.js version is compatible with the project requirements.
+
 ## Configuration Options
 
 ### Default Prompts
@@ -83,13 +93,13 @@ WriteSharp uses two default prompts to guide the AI in enhancing your text:
 
 1. **System Prompt:**
 
-```You are WriteSharp, an AI that enhances text clarity and professionalism.
-Rephrase input text, maintaining original intent. Provide only the enhanced version.
+```You are WriteSharp, an AI that enhances text clarity and professionalism. Rephrase input text, maintaining original intent. Provide only the enhanced version.
 ```
 
 2. **User Prompt:**
 
 ```Improve the following text with these guidelines:
+
 - Simplify complex sentences
 - Use precise, professional language
 - Ensure consistent tone and improved flow
