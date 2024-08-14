@@ -131,3 +131,6 @@ dist
 
 # remove node dependencies
 node_modules/
+
+# environment variables
+.env
