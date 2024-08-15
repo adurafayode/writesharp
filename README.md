@@ -1,41 +1,47 @@
 # WriteSharp
 
-WriteSharp is your AI-powered intelligent writing companion, available as a Chrome extension. It enhances selected text on any webpage with a single click, helping you improve clarity and professionalism in your writing across various platforms.
+WriteSharp is an open-source Chrome extension that leverages AI to enhance the clarity and professionalism of written text across various web platforms. Designed for simplicity and efficiency, it offers on-the-fly text improvements for users who frequently write in online environments.
 
-## How It Works
+## Features
 
-* Select text on any webpage.
-* Launch WriteSharp popup.
-* View original and AI-refined text.
-* Optionally revise or edit the refined text.
-* Click `Insert` to replace the original text.
+- **AI-Powered Enhancement**: Utilizes OpenAI's GPT models to refine selected text.
+- **Seamless Browser Integration**: One-click activation and text replacement in web forms.
+- **Customization**: Supports user-defined prompts for tailored refinements.
+- **User-Friendly Interface**: Side-by-side comparison and in-place editing of refined text.
+- **Privacy-Focused**: Secure API key management and local text processing.
 
-### WriteSharp in Action (Screenshot)
+Note: Currently not compatible with Google Docs, PowerPoint, or Excel.
+
+WriteSharp is ideal for professionals, students, and anyone looking to improve their online writing quickly and effectively.
+
+## How WriteSharp Works
+
+WriteSharp simplifies the process of improving your text:
+
+1. Select text on any webpage.
+2. Click the WriteSharp icon to launch the popup.
+3. Review the original and AI-refined versions side-by-side.
+4. Optionally edit the refined text.
+5. Click 'Insert' to replace the original text.
+
+Here's an example of WriteSharp in action:
 
 ![WriteSharp improving text clarity](./src/public/images/writesharp-demo.png)
 
-WriteSharp seamlessly integrates with your browser, allowing you to improve your writing with just a few clicks. As shown above, it transforms complex, wordy text into clear, concise language - perfect for emails, reports, or any written communication. By clicking `Insert`, the original text would be replaced with the improved version."
+WriteSharp transforms complex, wordy text into clear, concise language - ideal for emails, reports, or any written communication.
 
-**Original Text**
+## Installation
 
-```
-The implementation of the aforementioned protocol necessitates a comprehensive understanding of the underlying mechanisms. 
-It is imperative that all stakeholders involved in the process maintain a high level of cognizance regarding the potential ramifications of their actions. The successful execution of this initiative is contingent upon the synergistic collaboration of multiple departments within the organizational structure.
-```
+### Prerequisites
 
-**Refined Text by GPT-4o**
+- Node.js (version 14.0 or higher)
+- npm (usually comes with Node.js)
+- Google Chrome browser
 
-```
-Implementing this protocol requires a thorough understanding of its mechanisms. All stakeholders must be aware of the potential consequences of their actions. Successful execution depends on the collaborative efforts of various departments within the organization.
-```
+### Setup Steps
 
-## Features and Benefits
+1. **Clone the repository:**
 
-* **Instant Text Enhancement**: Automatically improves selected text when the popup is launched, focusing on clarity and professionalism.
-* **Flexible Editing**: View and compare original and refined text, with options to further revise or edit directly.
-* **Easy Integration**: Seamlessly insert refined text back into your document with a single click.
-* **Customizable AI**: Powered by OpenAI's GPT models, with options to use default or custom prompts.
-* **Cost-Effective**: Pay only for what you use through OpenAI credits, avoiding recurring subscription fees.
 
 ## Installation
 
@@ -59,7 +65,7 @@ npm install
 * Open the project in your preferred code editor.
 * Copy `.env.example` to `.env` and update the values as needed.
 * Navigate to `server.js` in the root directory.
-*  (Optional) The default port is set to 4000. If you wish to change the default, modify `PORT` in `.env`, `BACKEND_URL` in `src/background.js`, and `content_security_policy` in `manifest.json`.
+* (Optional) The default port is set to 4000. If you wish to change the default, modify `PORT` in `.env`, `BACKEND_URL` in `src/background.js`, and `content_security_policy` in `manifest.json`.
 
 4. **Start the Server**
 
@@ -69,27 +75,40 @@ node server.js
 
 5. **Load the Extension in Chrome**
 
-* Open Google Chrome and navigate to `chrome://extensions/`
-* Enable "Developer mode" using the toggle in the top right corner.
-* Click "Load unpacked" and select the `writesharp` directory you cloned in step 1.
+- Open Chrome and navigate to `chrome://extensions/`
+- Enable "Developer mode" (toggle in top right)
+- Click "Load unpacked"
+- Select the `writesharp` directory you cloned in step 1. 
 
 6. **Verify Installation**
 
 * You should now see the WriteSharp icon in your Chrome extensions toolbar.
 * Click on the icon to open the popup and start using WriteSharp!
 
-> Note: Make sure to keep the server running while using the extension. If you close the terminal or shut down your computer, you'll need to start the server again (step 4) to use WriteSharp.
+> Note: Keep the local server running while using the extension. If you close the terminal or restart your computer, you'll need to start the server again (step 4).
 
 ### Troubleshooting
 
-* If you encounter any issues with the extension not loading, try refreshing the `chrome://extensions/` page and reloading the unpacked extension.
-* Ensure that your Node.js version is compatible with the project requirements.
+- If the extension doesn't load, try refreshing the `chrome://extensions/` page and reloading the unpacked extension.
+- Ensure your Node.js version is compatible with the project requirements.
+- For any server-related issues, check the console where you're running `server.js` for error messages.
 
 ## Configuration Options
 
-### Default Prompts
+### API Key Setup
+1. Click the 'Settings' link in the WriteSharp popup.
+2. Enter your OpenAI API key.
+3. Click 'Save API Key'.
 
-WriteSharp uses two default prompts to guide the AI in enhancing your text:
+> **Important:** Keep your API key confidential. Never share it publicly or with unauthorized individuals.
+
+### Custom Prompts
+1. In the Settings menu, locate the 'Custom Prompt' section.
+2. Enter your desired prompt in the text area and save.
+3. Toggle 'Use Custom Prompt' to activate your custom instructions.
+
+### Default Prompts
+WriteSharp uses two default prompts:
 
 1. **System Prompt:**
 
@@ -111,35 +130,36 @@ Improve the following text with these guidelines:
 Input text:
 ```
 
-### Custom Prompts
+Note: Custom prompts modify only the user prompt. For system prompt changes, edit the `systemPrompt` variable in `server.js`.
 
-1. Access the settings in the WriteSharp popup.
-2. Enter your custom prompt in the provided textarea.
-3. Toggle the "Use Custom Prompt" switch to activate your custom instructions.
+### AI Model Parameters
+- Current model: GPT-4o
+- Temperature: 0.7
 
-> **Note on Custom Prompts:**
-> The custom prompt feature modifies only the user prompt sent to the OpenAI model. For advanced customization, including changes to the system prompt, you can edit the `systemPrompt` variable in `server.js`. 
+To modify these settings, edit the `createChatCompletion` method in `server.js`.
 
-### API Key Configuration
+## Contributing
 
-1. Obtain an API key from OpenAI.
-2. Open the WriteSharp popup and click on the "Settings" link.
-3. Enter your API key in the designated field and click "Save API Key".
+We welcome contributions to WriteSharp! Here's how you can help:
 
-Your API key is securely stored using Chrome's storage sync API. This means your key will be available on any device where you're logged into Chrome with your Google account, ensuring a seamless experience across your devices.
+1. **Report Issues**: Use GitHub Issues for bugs or enhancement suggestions.
 
-> **Important:** Keep your API key confidential. Never share it publicly or with unauthorized individuals.
+2. **Submit Pull Requests**: 
+   - Fork the repo and create your branch from `main`.
+   - Ensure code adheres to the existing style.
+   - Include tests for new features.
+   - Update documentation as needed.
 
-### AI Response Generation Settings
+3. **Development Setup**: Refer to the [Installation](#installation) section.
 
-* The model's temperature is set to 0.7 to balance creativity and coherence. The GPT-4o model is used for its advanced capabilities. If you prefer different parameters, you can modify them in the `createChatCompletion` method in `server.js`.
+For major changes, please open an issue first to discuss your ideas.
 
-## Limitations
+By contributing, you agree to abide by the project's code of conduct (to be implemented).
 
-* **Google Docs, PowerPoint, and Excel are not supported:** This extension currently does not support text selection or rephrasing functionalities in Google Docs, Microsoft PowerPoint, or Microsoft Excel. These platforms use custom rendering methods that are not compatible with standard DOM manipulation techniques.
+## Contact Information
 
-## License
+For questions, suggestions, or discussions about WriteSharp, you can reach out to the project maintainer:
 
-WriteSharp is open-source software licensed under the MIT License.
+- X (Twitter): [@Adurex](https://x.com/Adurex)
 
-This means you are free to use, modify, and distribute this software, even for commercial purposes, provided you include the original copyright notice and license text. For more details, see the LICENSE file in this repository.
+Feel free to send a direct message or mention @Adurex in a tweet related to WriteSharp.
