@@ -40,13 +40,6 @@ WriteSharp transforms complex, wordy text into clear, concise language - ideal f
 
 ### Setup Steps
 
-1. **Clone the repository:**
-
-
-## Installation
-
-Currently, WriteSharp supports manual installation only. Follow these steps to set up the extension on your local machine:
-
 1. **Clone the Repository**
 
 ```
@@ -85,7 +78,7 @@ node server.js
 * You should now see the WriteSharp icon in your Chrome extensions toolbar.
 * Click on the icon to open the popup and start using WriteSharp!
 
-> Note: Keep the local server running while using the extension. If you close the terminal or restart your computer, you'll need to start the server again (step 4).
+Note: Keep the local server running while using the extension. If you close the terminal or restart your computer, you'll need to start the server again (step 4).
 
 ### Troubleshooting
 
@@ -100,7 +93,7 @@ node server.js
 2. Enter your OpenAI API key.
 3. Click 'Save API Key'.
 
-> **Important:** Keep your API key confidential. Never share it publicly or with unauthorized individuals.
+Important: Keep your API key confidential. Never share it publicly or with unauthorized individuals.
 
 ### Custom Prompts
 1. In the Settings menu, locate the 'Custom Prompt' section.
