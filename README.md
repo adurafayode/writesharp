@@ -39,6 +39,7 @@ If/when published, this section will include a link to the store listing.
 ## Permissions
 
 WriteSharp requests a minimal set of permissions to operate:
+
 - `activeTab`, `scripting`, and `storage`
 - Site matches for common editors (e.g., Gmail, Slack, GitHub, Zendesk) to enable selection and insertion
 
@@ -81,6 +82,7 @@ Contributions are welcome! Standard GitHub flow:
 3. Open a pull request against `main` with a concise description.
 
 Code style:
+
 - Keep functions focused and readable.
 - Use descriptive names.
 - Prefer minimal and explicit permissions.

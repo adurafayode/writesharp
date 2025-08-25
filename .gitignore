@@ -44,6 +44,10 @@ node_modules/
 # local archives and analysis outputs (not for source control or releases)
 Archive.zip
 repomix-output.txt
+
+# macOS Finder metadata
+.DS_Store
+**/.DS_Store
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
