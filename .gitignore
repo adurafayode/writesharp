@@ -40,6 +40,10 @@ build/Release
 
 # Dependency directories
 node_modules/
+
+# local archives and analysis outputs (not for source control or releases)
+Archive.zip
+repomix-output.txt
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)

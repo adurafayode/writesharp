@@ -1,83 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WriteSharp</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="popup.css">
-</head>
-<body>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="popup.css" />
+  </head>
+  <body>
     <!-- Header -->
     <header>
-        <h1>WriteSharp</h1>
-        <p>Improve clarity and professionalism</p>
+      <h1>WriteSharp</h1>
+      <p>Improve clarity and professionalism</p>
     </header>
 
     <main>
-        <!-- Original text input -->
-        <div id="original-text-container">
-            <label for="original-text">Original Text:</label>
-            <textarea id="original-text" readonly aria-label="Original text to be rephrased"></textarea>
-            <div class="char-count">0/750</div>
+      <!-- Original text input -->
+      <div id="originalTextContainer">
+        <label for="originalText">Original Text:</label>
+        <div
+          id="originalText"
+          class="rich-text-editor"
+          contenteditable="false"
+          aria-label="Original text to be rephrased"
+        ></div>
+        <div id="textLengthContainer">
+          <span id="charactersCounter" class="text-gray-500">0/2000</span>
         </div>
+      </div>
 
-        <!-- Rephrased text output -->
-        <div id="rephrased-text-container">
-            <label for="rephrased-text">Refined Text:</label>
-            <textarea id="rephrased-text" aria-label="Rephrased text, editable"></textarea>
-            <div class="char-count">0/750</div>
-        </div>
+      <!-- Rephrased text output -->
+      <div id="rephrasedTextContainer">
+        <label for="rephrasedText">Refined Text:</label>
+        <div
+          id="rephrasedText"
+          class="rich-text-editor"
+          contenteditable="true"
+          aria-label="Rephrased text with formatting"
+        ></div>
+      </div>
 
-        <!-- Action buttons -->
-        <div id="action-buttons">
-            <button id="apply-button" class="primary-button" aria-label="Apply rephrased text to original document">Insert</button>
-            <button id="edit-button" class="secondary-button" aria-label="Toggle editing of rephrased text">Edit</button>
-            <button id="rephrase-again-button" class="secondary-button" aria-label="Rephrase the text again">Revise</button>
-        </div>
+      <!-- Action buttons -->
+      <div id="actionButtons">
+        <button
+          id="rephraseBtn"
+          class="primary-button"
+          aria-label="Rephrase the selected text"
+        >
+          Rephrase
+        </button>
+        <button
+          id="insertBtn"
+          class="primary-button"
+          aria-label="Insert rephrased text"
+          disabled
+        >
+          Insert
+        </button>
+        <button
+          id="copyBtn"
+          class="primary-button hidden"
+          aria-label="Copy rephrased text to clipboard"
+          disabled
+        >
+          Copy to Clipboard
+        </button>
+        <button
+          id="clearSelectionBtn"
+          class="secondary-button"
+          aria-label="Clear current selection"
+        >
+          Clear
+        </button>
+      </div>
 
-        <!-- Loading state -->
-        <div id="loading-state" class="hidden">
-            <div class="spinner"></div>
-            <p>Rewriting...</p>
-        </div>
+      <!-- Error message -->
+      <div id="errorText" class="hidden text-red-500"></div>
 
-        <!-- Error state -->
-        <div id="error-state" class="hidden">
-            <div class="error-icon"></div>
-            <p id="error-message"></p>
-            <button id="try-again-button" class="secondary-button">Try Again</button>
-        </div>
+      <!-- Loading spinner -->
+      <div id="loadingSpinner" class="hidden">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+      </div>
 
-        <!-- Settings container -->
-        <div id="settings-container" class="hidden" style="display: none;">
-            <div class="settings-section">
-                <label for="api-key">API Key:</label>
-                <input type="password" id="api-key" aria-label="Enter your API key">
-                <button id="save-api-key" class="secondary-button">Save API Key</button>
-            </div>
-            <div class="settings-section">
-                <label for="custom-prompt">Custom Prompt:</label>
-                <textarea id="custom-prompt" aria-label="Enter your custom rephrasing prompt"></textarea>
-                <div class="char-count">0/750</div>
-                <button id="save-custom-prompt" class="secondary-button">Save Custom Prompt</button>
-            </div>
-            <div class="toggle-container">
-                <label class="switch">
-                    <input type="checkbox" id="use-custom-prompt">
-                    <span class="slider round"></span>
-                </label>
-                <span>Use Custom Prompt</span>
-            </div>
+      <!-- Settings panel (initially hidden) -->
+      <div id="settingsPanel" class="hidden">
+        <h2>Settings</h2>
+        <div class="settings-section">
+          <label for="apiKey">API Key:</label>
+          <input type="password" id="apiKey" aria-label="Enter your API key" />
+          <button id="saveKeyBtn" class="secondary-button">Save Key</button>
         </div>
+        <div class="settings-section">
+          <label for="modelSelect">AI Model:</label>
+          <select id="modelSelect" aria-label="Select AI model">
+            <option value="gpt-4o">GPT-4o (Recommended)</option>
+            <option value="gpt-4o-mini">GPT-4o-mini (Faster)</option>
+            <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fastest)</option>
+          </select>
+          <button id="saveModelBtn" class="secondary-button">Save Model</button>
+        </div>
+        <div class="settings-section">
+          <label for="customPrompt">Custom Prompt:</label>
+          <textarea
+            id="customPrompt"
+            aria-label="Enter your custom rephrasing prompt"
+          ></textarea>
+          <div class="toggle-container">
+            <input type="checkbox" id="useCustomPrompt" />
+            <label for="useCustomPrompt">Use Custom Prompt</label>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Footer -->
     <footer>
-        <p>Processed locally for privacy</p>
-        <a href="#" id="settings-link">Settings</a>
+      <p>Processed locally for privacy</p>
+      <a href="#" id="settingsToggle">Settings</a>
     </footer>
 
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>

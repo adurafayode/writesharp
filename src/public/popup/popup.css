@@ -1,6 +1,10 @@
 /* WriteSharp Popup Styles */
 
 /* Base styles and typography */
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     margin: 0;
@@ -8,50 +12,54 @@ body {
     background-color: #FFFFFF;
     width: 450px;
     color: #333333;
-  }
-  
-  h1 {
+}
+
+h1 {
     font-size: 20px;
     margin: 0;
     font-weight: 700;
-  }
+}
   
-  p, label, textarea, button {
+p, label, textarea, button {
     font-size: 14px;
-  }
+}
   
-  .char-count, footer {
+#charactersCounter, footer {
     font-size: 12px;
-  }
+}
   
-  /* Layout */
-  header, main, footer {
+/* Layout */
+header, footer {
     padding: 15px;
-  }
+}
   
-  .section {
+main {
+    padding: 15px;
+}
+  
+.section {
     margin-bottom: 15px;
-  }
+}
   
-  /* Header styles */
-  header {
+/* Header styles */
+header {
     background-color: #4285F4;
     color: white;
     text-align: left;
-  }
+}
   
-  header p {
+header p {
     margin: 4px 0 0;
-  }
+}
   
-  /* Main content styles */
-  label {
+/* Main content styles */
+label {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
-  }
+}
   
-  textarea {
+textarea {
     width: 100%;
     height: 115px;
     padding: 10px;
@@ -59,74 +67,101 @@ body {
     border: 1px solid #E0E0E0;
     border-radius: 4px;
     resize: none;
-  }
+}
   
-  .char-count {
-    text-align: left;
-    color: #666666;
+#textLengthContainer {
+    display: flex;
+    justify-content: flex-end;
     margin-bottom: 10px;
-  }
+}
+
+#charactersCounter {
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.text-gray-500 {
+    color: #6B7280;
+}
+
+.text-yellow-500 {
+    color: #F59E0B;
+}
+
+.text-red-500 {
+    color: #DC2626;
+}
   
-  /* Button styles */
-  #action-buttons {
+/* Button styles */
+#actionButtons {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-  }
+}
   
-  button {
+button {
     padding: 8px 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.3s ease;
-  }
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
   
-  .primary-button {
+.primary-button {
     background-color: #4285F4;
     color: white;
-  }
+}
   
-  .primary-button:hover {
+.primary-button:hover:not(:disabled) {
     background-color: #3367D6;
-  }
+}
   
-  .primary-button:focus {
+.primary-button:focus {
     outline: 2px solid #3367D6;
-  }
+}
   
-  .secondary-button {
+.secondary-button {
     background-color: #BDBDBD;
     color: #333333;
-  }
+}
   
-  .secondary-button:hover {
+.secondary-button:hover:not(:disabled) {
     background-color: #A0A0A0;
-  }
+}
   
-  .secondary-button:focus {
+.secondary-button:focus {
     outline: 2px solid #4285F4;
-  }
+}
   
-  /* State-specific styles */
-  #loading-state,
-  #error-state,
-  #settings-container {
-    text-align: center;
+/* State-specific styles */
+#loadingSpinner,
+#errorText,
+#settingsPanel {
     padding: 20px;
     background-color: white;
-    border: 1px solid #E0E0E0;
     border-radius: 4px;
-    display: none;
-  }
+    margin-top: 10px;
+}
+
+#errorText {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #F8D7DA;
+    border-radius: 4px;
+}
   
-  .hidden {
+.hidden {
     display: none !important;
-  }
+}
   
-  /* Loading spinner */
-  .spinner {
+/* Loading spinner */
+.spinner {
     border: 4px solid #E0E0E0;
     border-top: 4px solid #4285F4;
     border-radius: 50%;
@@ -134,150 +169,258 @@ body {
     height: 32px;
     animation: spin 1s linear infinite;
     margin: 0 auto 8px;
-  }
+}
   
-  @keyframes spin {
+@keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
+}
   
-  /* Error state */
-  .error-icon {
-    color: #DC3545;
-    font-size: 32px;
-    margin-bottom: 8px;
-  }
+#loadingSpinner {
+    text-align: center;
+}
   
-  /* Footer styles */
-  footer {
+/* Footer styles */
+footer {
     background-color: #F4F4F9;
     text-align: center;
     color: #666666;
-  }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
   
-  #settings-link {
+#settingsToggle {
     color: #4285F4;
     text-decoration: none;
     transition: all 0.3s ease;
-  }
+}
   
-  #settings-link:hover {
+#settingsToggle:hover {
     text-decoration: underline;
-  }
+}
   
-  #settings-link:focus {
+#settingsToggle:focus {
     outline: 2px solid #4285F4;
     outline-offset: 2px;
     border-radius: 2px;
-  }
+}
   
-  /* Message styles */
-  .message {
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 4px;
-  }
+/* Settings panel styles */
+#settingsPanel {
+    border: 1px solid #E0E0E0;
+    margin-top: 15px;
+}
+
+#settingsPanel h2 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
   
-  .message.success {
-    background-color: #D4EDDA;
-    color: #155724;
-  }
-  
-  .message.error {
-    background-color: #F8D7DA;
-    color: #721C24;
-  }
-  
-  /* Custom prompt and settings styles */
-  #custom-prompt {
+.settings-section {
+    margin-bottom: 20px;
+}
+
+#customPrompt {
     width: 100%;
     height: 80px;
-    margin-bottom: 5px;
-  }
-  
-  /* Toggle switch styles */
-  .toggle-container {
+    margin-bottom: 10px;
+}
+
+/* Toggle container styles */
+.toggle-container {
     display: flex;
     align-items: center;
-    margin-top: 10px;
-    justify-content: space-between;
-    padding: 5px 0;
-  }
-  
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-    margin-right: 10px;
-  }
-  
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
+    margin: 10px 0;
+}
+
+.toggle-container input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Rich text editor styles with stronger isolation */
+.rich-text-editor {
+    width: calc(100% - 5px);
+    min-height: 115px;
+    max-height: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    resize: none;
+    overflow-y: auto;
     background-color: white;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #4285F4;
-  }
-  
-  input:checked + .slider:before {
-    transform: translateX(26px);
-  }
-  
-  .slider.round {
-    border-radius: 24px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
-  
-  /* Settings container styles */
-  #settings-container {
-    margin-top: 15px;
-    border-top: 1px solid #E0E0E0;
-    padding-top: 15px;
-  }
-  
-  .settings-section {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    isolation: isolate;
+    -webkit-font-smoothing: antialiased;
+    color: #333333 !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* When both text areas need to expand for longer content */
+.expanded-text-view .rich-text-editor {
+    height: auto;
+    max-height: 300px;
+}
+
+/* Text area containers */
+#originalTextContainer, #rephrasedTextContainer {
     margin-bottom: 15px;
-  }
-  
-  input[type="password"],
-  textarea {
+}
+
+#rephrasedTextContainer {
+    padding-right: 5px;
+}
+
+/* Enforce consistent paragraph styling across both editors */
+.rich-text-editor p {
+    margin: 0 0 1.25em 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure consistent styling for all content within rich text editors */
+.rich-text-editor * {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    text-shadow: none !important;
+}
+
+/* Enforce specific styles for common HTML elements in the rich text editor */
+.rich-text-editor ul, 
+.rich-text-editor ol {
+    padding-left: 24px !important;
+    margin: 8px 0 !important;
+    list-style-position: outside !important;
+}
+
+.rich-text-editor ul {
+    list-style-type: disc !important;
+}
+
+.rich-text-editor ol {
+    list-style-type: decimal !important;
+}
+
+.rich-text-editor li {
+    margin: 4px 0 !important;
+    padding: 0 !important;
+    display: list-item !important;
+}
+
+.rich-text-editor strong, 
+.rich-text-editor b {
+    font-weight: bold !important;
+}
+
+.rich-text-editor em, 
+.rich-text-editor i {
+    font-style: italic !important;
+}
+
+.rich-text-editor:focus {
+    outline: 2px solid #4285F4;
+}
+
+.rich-text-editor h1, 
+.rich-text-editor h2, 
+.rich-text-editor h3, 
+.rich-text-editor h4, 
+.rich-text-editor h5, 
+.rich-text-editor h6 {
+    margin: 10px 0 5px 0;
+    font-weight: 600;
+}
+
+.rich-text-editor h1 { font-size: 18px; }
+.rich-text-editor h2 { font-size: 16px; }
+.rich-text-editor h3 { font-size: 15px; }
+.rich-text-editor h4, 
+.rich-text-editor h5, 
+.rich-text-editor h6 { font-size: 14px; }
+
+.rich-text-editor a {
+    color: #4285F4;
+    text-decoration: underline;
+}
+
+.rich-text-editor blockquote {
+    border-left: 3px solid #E0E0E0;
+    margin: 8px 0;
+    padding: 4px 0 4px 12px;
+    color: #666;
+}
+
+.rich-text-editor code {
+    font-family: monospace;
+    background-color: #F4F4F9;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+/* Settings panel */
+select#modelSelect {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #E0E0E0;
     border-radius: 4px;
-  }
-  
-  #save-api-key,
-  #save-custom-prompt {
-    width: 100%;
-    margin-top: 5px;
-  }  
+    background-color: white;
+    font-size: 14px;
+}
+
+select#modelSelect:focus {
+    outline: 2px solid #4285F4;
+    border-color: #4285F4;
+}
+
+/* Prompt status indicator */
+.prompt-status {
+    font-size: 12px;
+    color: #4285F4;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    font-style: italic;
+    padding-left: 2px;
+    transition: color 0.3s ease;
+}
+
+.prompt-status:empty {
+    display: none;
+}
+
+/* Regular input styling continues... */
+
+/* Slightly increase height for expanded view */
+.expanded-text-view {
+    max-height: none;
+    transition: max-height 0.3s ease;
+}
+
+/* Add a subtle scrollbar styling for better UX with longer text */
+.rich-text-editor::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rich-text-editor::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.rich-text-editor::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.rich-text-editor::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* End of file */  

@@ -1,127 +1,92 @@
 # WriteSharp
 
-WriteSharp is your AI-powered intelligent writing companion, available as a Chrome extension. It enhances selected text on any webpage with a single click, helping you improve clarity and professionalism in your writing across various platforms.
+WriteSharp is a Chrome extension that helps anyone improve clarity and tone in text areas on the web. It provides quick, AI-assisted rewrites that preserve your meaning while enhancing readability and professionalism.
 
-## How It Works
+## Features
 
-* Select text on any webpage.
-* Launch WriteSharp popup.
-* View original and AI-refined text.
-* Optionally revise or edit the refined text.
-* Click `Insert` to replace the original text.
+- **AI-powered rewriting** using your own OpenAI API key
+- **One-click rephrase** from a popup, with side-by-side comparison
+- **Preserves structure** (lists, paragraphs) and factual details
+- **Copy-to-clipboard workflow** for strict editors; direct insert where allowed
+- **Custom prompts and model selection** (e.g., GPT-4o, GPT-4o-mini, GPT-3.5-turbo)
+- **Local storage** for settings via `chrome.storage.sync`
 
-### WriteSharp in Action (Screenshot)
+Note: Google Docs is not currently supported.
+
+## How it works
+
+1. Select text on any supported site.
+2. Open the WriteSharp popup to review the selected text.
+3. Choose a model and optionally a custom prompt.
+4. Click Rephrase to generate an improved version.
+5. Insert the refined text back into the page or copy it if insertion is restricted.
 
 ![WriteSharp improving text clarity](./src/public/images/writesharp-demo.png)
 
-WriteSharp seamlessly integrates with your browser, allowing you to improve your writing with just a few clicks. As shown above, it transforms complex, wordy text into clear, concise language - perfect for emails, reports, or any written communication. By clicking `Insert`, the original text would be replaced with the improved version."
-
-**Original Text**
-
-```
-The implementation of the aforementioned protocol necessitates a comprehensive understanding of the underlying mechanisms. It is imperative that all stakeholders involved in the process maintain a high level of cognizance regarding the potential ramifications of their actions. The successful execution of this initiative is contingent upon the synergistic collaboration of multiple departments within the organizational structure.
-```
-
-**Refined Text by GPT-4o**
-
-```
-Implementing this protocol requires a thorough understanding of its mechanisms. All stakeholders must be aware of the potential consequences of their actions. Successful execution depends on the collaborative efforts of various departments within the organization.
-```
-
-
-## Features and Benefits
-
-* **Instant Text Enhancement**: Automatically improves selected text when the popup is launched, focusing on clarity and professionalism.
-* **Flexible Editing**: View and compare original and refined text, with options to further revise or edit directly.
-* **Easy Integration**: Seamlessly insert refined text back into your document with a single click.
-* **Customizable AI**: Powered by OpenAI's GPT models, with options to use default or custom prompts.
-* **Cost-Effective**: Pay only for what you use through OpenAI credits, avoiding recurring subscription fees.
-
 ## Installation
 
-Currently, WriteSharp supports manual installation only. Follow these steps to set up the extension on your local machine:
+### Load unpacked (development)
 
-1. **Clone the Repository**
+1. Download or clone this repository.
+2. Open Chrome and go to `chrome://extensions/`.
+3. Enable Developer mode.
+4. Click "Load unpacked" and select the project root directory (the folder containing `manifest.json`).
 
-```
-git clone https://github.com/adurafayode/writesharp.git
-cd writesharp
-```
+### Chrome Web Store (optional)
 
-2. **Install Dependencies**
+If/when published, this section will include a link to the store listing.
 
-```
-npm install
-```
+## Permissions
 
-3. **Configure the Server**
+WriteSharp requests a minimal set of permissions to operate:
 
-* Open the project in your preferred code editor.
-* Navigate to `server.js` in the root directory.
-* (Optional) If you wish to change the default port (4000), modify the PORT variable.
+- `activeTab`, `scripting`, and `storage`
+- Site matches for common editors (e.g., Gmail, Slack, GitHub, Zendesk) to enable selection and insertion
 
-4. **Start the Server**
+You can review and adjust host permissions in `manifest.json`.
 
-```
-node server.js
-```
+## Configuration
 
-5. **Load the Extension in Chrome**
+- API key: Add your OpenAI API key in the popup settings. It is stored via `chrome.storage.sync` on your Chrome profile and used only to call the OpenAI API from the extension.
+- Model selection: Choose from GPT-4o, GPT-4o-mini, or GPT-3.5-turbo (availability may change over time).
+- Custom prompt: Provide optional instructions to guide rewriting style.
 
-* Open Google Chrome and navigate to `chrome://extensions/`
-* Enable "Developer mode" using the toggle in the top right corner.
-* Click "Load unpacked" and select the `writesharp` directory you cloned in step 1.
+## Privacy & Security
 
-6. **Verify Installation**
+- Your selected text is sent to the OpenAI API endpoint you configure (default: `https://api.openai.com/v1/chat/completions`).
+- The API key is stored using `chrome.storage.sync` and is not transmitted anywhere except to the configured API endpoint for your requests.
+- No telemetry is collected by this extension.
 
-## Configuration Options
+For stricter environments, you can use your own proxy endpoint and update the endpoint in `src/background.js` (and the CSP in `manifest.json`).
 
-### Default Prompts
+## Platform compatibility
 
-WriteSharp uses two default prompts to guide the AI in enhancing your text:
+- Direct insert (typical): Gmail, Slack, GitHub, and other standard textareas/contenteditables
+- Copy-to-clipboard mode: Editors with strict policies (e.g., Zendesk)
+- Not supported: Google Docs and some locked-down web editors
 
-1. **System Prompt:**
+WriteSharp detects the editor type and will prompt for the most compatible action.
 
-```You are WriteSharp, an AI that enhances text clarity and professionalism.
-Rephrase input text, maintaining original intent. Provide only the enhanced version.
-```
+## Development
 
-2. **User Prompt:**
+- Prerequisites: Recent Node.js and npm (for any tooling you may add). No build step is required.
+- Code location: Background and content scripts in `src/`, popup UI in `src/public/popup/`.
+- Load via `chrome://extensions` → Load unpacked.
 
-```Improve the following text with these guidelines:
-- Simplify complex sentences
-- Use precise, professional language
-- Ensure consistent tone and improved flow
-- Correct grammar and punctuation
-- Adapt to professional contexts
+## Contributing
 
-Input text:
-```
+Contributions are welcome! Standard GitHub flow:
 
-### Custom Prompts
+1. Fork the repo and create a branch.
+2. Make your changes with clear commits.
+3. Open a pull request against `main` with a concise description.
 
-1. Access the settings in the WriteSharp popup.
-2. Enter your custom prompt in the provided textarea.
-3. Toggle the "Use Custom Prompt" switch to activate your custom instructions.
+Code style:
 
-> **Note on Custom Prompts:**
-> The custom prompt feature modifies only the user prompt sent to the OpenAI model. For advanced customization, including changes to the system prompt, you can edit line 72 in the server.js file of your forked instance.
-
-### API Key Configuration
-
-1. Obtain an API key from OpenAI.
-2. Open the WriteSharp popup and click on the "Settings" link.
-3. Enter your API key in the designated field and click "Save API Key".
-
-Your API key is securely stored using Chrome's storage sync API. This means your key will be available on any device where you're logged into Chrome with your Google account, ensuring a seamless experience across your devices.
-
-> **Important:** Keep your API key confidential. Never share it publicly or with unauthorized individuals.
+- Keep functions focused and readable.
+- Use descriptive names.
+- Prefer minimal and explicit permissions.
 
 ## License
 
-WriteSharp is open-source software licensed under the MIT License.
-
-This means you are free to use, modify, and distribute this software, even for commercial purposes, provided you include the original copyright notice and license text. For more details, see the LICENSE file in this repository.
-
-
-
+MIT License. See `LICENSE` for details.
